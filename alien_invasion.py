@@ -70,15 +70,16 @@ class AlienInvasion:
 
     def _fire_bullets(self):
         """ Create a new bullet and add it to the bullets group. """
-        new_bullet = Bullet(self)
-        self.bullets.add(new_bullet)
+        if len(self.bullets) < self.settings.bullet_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
 
     def _update_screen(self):
         """ Update images on the screen and flip to new screen. """
         self.screen.fill(self.settings.bg_color)
         self.ship.blitme()
         for bullet in self.bullets.sprites():
-           bullet.draw_bullet()
+            bullet.draw_bullet()
 
         # Make the most recently drawn screen visible.
         pygame.display.flip()
