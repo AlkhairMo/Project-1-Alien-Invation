@@ -8,6 +8,7 @@ from ship import Ship
 
 from bullet import Bullet
 
+
 class AlienInvasion:
     """ Overall class to manage game assets and behavior """
     def __init__(self):
@@ -28,9 +29,16 @@ class AlienInvasion:
             self._check_events()
 
             self.ship.update()
+
+            self.bullets.update()
+
+            # Get rid of bullets that have disappeared
+            for bullet in self.bullets.copy():
+                if bullet.rect.bottom <= 0:
+                    self.bullets.remove(bullet)
+
             # Redraw the screen during each pass through the loop.
             self._update_screen()
-            self.bullets.update()
 
     def _check_events(self):
         """ Respond to key presses and mouse events. """
