@@ -56,6 +56,9 @@ class AlienInvasion:
         """ Respond to key presses and mouse events. """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                high_score_string = str(self.stats.high_score)
+                with open('High_score.txt', 'w') as high_score:
+                    high_score.write(high_score_string)
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
