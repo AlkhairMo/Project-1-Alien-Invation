@@ -10,6 +10,7 @@ from button import Button
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+from sound_effects import SoundEffects
 
 
 class AlienInvasion:
@@ -32,6 +33,7 @@ class AlienInvasion:
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        self.sound = SoundEffects()
 
         self._create_fleet()
 
@@ -60,10 +62,11 @@ class AlienInvasion:
                 with open('High_score.txt', 'w') as high_score:
                     high_score.write(high_score_string)
                 sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                self._check_keydown_events(event)
-            elif event.type == pygame.KEYUP:
-                self._check_keyup_events(event)
+            elif self.stats.game_active:
+                if event.type == pygame.KEYDOWN:
+                    self._check_keydown_events(event)
+                elif event.type == pygame.KEYUP:
+                    self._check_keyup_events(event)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 self._check_play_button(mouse_pos)
@@ -102,6 +105,7 @@ class AlienInvasion:
             sys.exit()
         elif event.key == pygame.K_SPACE:
             self._fire_bullets()
+            self.sound.play_sound(self.sound.shot)
 
     def _check_keyup_events(self, event):
         """ Respond to key release """
@@ -164,6 +168,8 @@ class AlienInvasion:
             # Decrement ship_left.
             self.stats.ship_left -= 1
             self.sb.prep_ships()
+            pygame.mixer.Sound.stop(self.sound.shot)
+            self.sound.play_sound(self.sound.ship_lose)
 
             # Get tid of any remaining aliens and bullets.
             self.aliens.empty()
@@ -177,6 +183,7 @@ class AlienInvasion:
             sleep(0.5)
 
         else:
+            self.sound.play_sound(self.sound.game_over)
             self.stats.game_active = False
             pygame.mouse.set_visible(True)
 
@@ -209,6 +216,7 @@ class AlienInvasion:
         if collisions:
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
+            self.sound.play_sound(self.sound.points)
             self.sb.prep_score()
             self.sb.check_high_score()
 
@@ -221,6 +229,7 @@ class AlienInvasion:
             # Increase level
             self.stats.level += 1
             self.sb.prep_level()
+            self.sound.play_sound(self.sound.new_level)
 
     def _update_aliens(self):
         """
