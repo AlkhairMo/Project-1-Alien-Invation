@@ -75,25 +75,27 @@ class AlienInvasion:
         """ Start a new game when the player clicks play. """
         if (self.play_button.rect.collidepoint(mouse_pos)
                 and not self.stats.game_active):
-            # Reset the game settings
-            self.settings.initialize_dynamic_settings()
-            # Reset the game statistics
-            self.stats.reset_stats()
-            self.stats.game_active = True
-            self.sb.prep_score()
-            self.sb.prep_level()
-            self.sb.prep_ships()
+            self._start_game()
 
-            # Get rid of any remaining aliens and bullets.
-            self.aliens.empty()
-            self.bullets.empty()
+    def _start_game(self):
+        """ Start a new game. """
+        # Reset the game settings
+        self.settings.initialize_dynamic_settings()
+        # Reset the game statistics
+        self.stats.reset_stats()
+        self.stats.game_active = True
+        self.sb.prep_images()
 
-            # Create a new fleet and center the ship
-            self._create_fleet()
-            self.ship.center_ship()
+        # Get rid of any remaining aliens and bullets.
+        self.aliens.empty()
+        self.bullets.empty()
 
-            # Hide the mouse cursor
-            pygame.mouse.set_visible(False)
+        # Create a new fleet and center the ship
+        self._create_fleet()
+        self.ship.center_ship()
+
+        # Hide the mouse cursor
+        pygame.mouse.set_visible(False)
 
     def _check_keydown_events(self, event):
         """ Respond to key presses """
@@ -221,15 +223,19 @@ class AlienInvasion:
             self.sb.check_high_score()
 
         if not self.aliens:
-            # Destroy existing bullets and create new fleet.
-            self.bullets.empty()
-            self._create_fleet()
-            self.settings.increase_speed()
+            self._start_new_level()
 
-            # Increase level
-            self.stats.level += 1
-            self.sb.prep_level()
-            self.sound.play_sound(self.sound.new_level)
+    def _start_new_level(self):
+        """ Start new level after pass one. """
+        # Destroy existing bullets and create new fleet.
+        self.bullets.empty()
+        self._create_fleet()
+        self.settings.increase_speed()
+
+        # Increase level
+        self.stats.level += 1
+        self.sb.prep_level()
+        self.sound.play_sound(self.sound.new_level)
 
     def _update_aliens(self):
         """
